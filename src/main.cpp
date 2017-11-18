@@ -202,10 +202,10 @@ int main() {
   int lane = 1;
 
   // initial velocity
-  double ref_vel = 49.5; // in mph
+  double ref_vel = 49.5 / 2.24; // in m/s
 
-  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
-                     uWS::OpCode opCode) {
+  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &ref_vel, &lane]
+               (uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -276,9 +276,9 @@ int main() {
 
             // we want the path to be "smooth", so we define the second starting reference
             // waypoint behind the car such that the path is tangent to the car's trajectory
-            // TODO: scale the cos and sin
-            prev_ref_x = ref_x - cos(ref_yaw);
-            prev_ref_y = ref_y - sin(ref_yaw);
+            // TODO: scale the cos and sin?
+            prev_ref_x = ref_x - 1.0 * cos(ref_yaw);
+            prev_ref_y = ref_y - 1.0 * sin(ref_yaw);
           }
 
           ptsx.push_back(prev_ref_x);
@@ -297,7 +297,7 @@ int main() {
             ptsy.push_back(ref_wp[1]);
           }
 
-          // transform to new local coordinates:
+          // transform to new local coordinates (easier to handle further calculations on the spline):
           // - origin: position of car OR end point of the previous path
           // - orientation: car's yaw OR tangent to the ending of the previous path
           for(int i = 0; i < ptsx.size(); i++){
@@ -317,13 +317,30 @@ int main() {
           // points that will actually be used for the planner
           vector<double> next_x_vals, next_y_vals;
 
-          // start by "recicling" the leftovers of the previous path
+          // start by "recycling the leftovers" of the previous path
           for(int i = 0; i < prev_path_size; i++){
             next_x_vals.push_back(previous_path_x[i]);
             next_y_vals.push_back(previous_path_y[i]);
           }
 
-          // TODO: finish implementing base case
+          // break up the spline in a set of points such that the car travels at the desired velocity
+          double target_x = 30;
+          double target_y = s(target_x);
+          double target_dist = sqrt(target_x * target_x + target_y * target_y);
+
+          // fill up the rest of the path planner (up to 50 points)
+          for(int i = 0; i <= 50 - prev_path_size; i++){
+            double N = target_dist / (.02 * ref_vel);
+            double x_ref = (i + 1) * target_x / N;
+            double y_ref = s(x_ref);
+
+            // switch back to global coordinates
+            double x_point = ref_x + x_ref * cos(ref_yaw) - y_ref * sin(ref_yaw);
+            double y_point = ref_y + x_ref * sin(ref_yaw) + y_ref * cos(ref_yaw);
+
+            next_x_vals.push_back(x_point);
+            next_y_vals.push_back(y_point);
+          }
 
 
           msgJson["next_x"] = next_x_vals;

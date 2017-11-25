@@ -25,6 +25,14 @@ struct State {
   double v;
 };
 
+struct MapWaypoints {
+  vector<double> x;
+  vector<double> y;
+  vector<double> s;
+  vector<double> dx;
+  vector<double> dy;
+};
+
 struct Path {
   vector<double> pts_x;
   vector<double> pts_y;

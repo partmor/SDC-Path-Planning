@@ -20,9 +20,7 @@ struct PathGenerator{
                      int lane,
                      double ref_vel,
                      Path &previous_path,
-                     const vector<double> &maps_s,
-                     const vector<double> &maps_x,
-                     const vector<double> &maps_y);
+                     const MapWaypoints map_wps);
 };
 
 

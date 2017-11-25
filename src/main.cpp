@@ -38,11 +38,7 @@ int main() {
   uWS::Hub h;
 
   // Load up map values for waypoint's x,y,s and d normalized normal vectors
-  vector<double> map_waypoints_x;
-  vector<double> map_waypoints_y;
-  vector<double> map_waypoints_s;
-  vector<double> map_waypoints_dx;
-  vector<double> map_waypoints_dy;
+  MapWaypoints map_wps;
 
   // Waypoint map to read from
   string map_file_ = "../data/highway_map.csv";
@@ -64,11 +60,11 @@ int main() {
   	iss >> s;
   	iss >> d_x;
   	iss >> d_y;
-  	map_waypoints_x.push_back(x);
-  	map_waypoints_y.push_back(y);
-  	map_waypoints_s.push_back(s);
-  	map_waypoints_dx.push_back(d_x);
-  	map_waypoints_dy.push_back(d_y);
+  	map_wps.x.push_back(x);
+  	map_wps.y.push_back(y);
+  	map_wps.s.push_back(s);
+  	map_wps.dx.push_back(d_x);
+  	map_wps.dy.push_back(d_y);
   }
 
   // set initial lane
@@ -80,7 +76,7 @@ int main() {
   // ego vehicle, id = 0
   Vehicle car = Vehicle(0);
 
-  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &ref_vel, &lane, &car]
+  h.onMessage([&map_wps, &ref_vel, &lane, &car]
                (uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -116,9 +112,7 @@ int main() {
             lane,
             ref_vel,
             previous_path,
-            map_waypoints_s,
-            map_waypoints_x,
-            map_waypoints_y
+            map_wps
           );
 
           msgJson["next_x"] = path.pts_x;

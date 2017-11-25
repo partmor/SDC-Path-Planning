@@ -13,9 +13,7 @@ Path PathGenerator::generate_path(Vehicle &egoVehicle,
                                   int lane,
                                   double ref_vel,
                                   Path &previous_path,
-                                  const vector<double> &maps_s,
-                                  const vector<double> &maps_x,
-                                  const vector<double> &maps_y){
+                                  const MapWaypoints map_wps){
 
   // IMPORTANT
   // to ensure a smooth transition from cycle to cycle, the new path at a given cycle is
@@ -66,7 +64,7 @@ Path PathGenerator::generate_path(Vehicle &egoVehicle,
   for(int i = 0; i < 3; i++){
     double wp_s = egoVehicle.state.s + (i + 1) * 30;
     double wp_d = 2 + 4 * lane;
-    vector<double> ref_wp = getXY(wp_s, wp_d, maps_s, maps_x, maps_y);
+    vector<double> ref_wp = getXY(wp_s, wp_d, map_wps.s, map_wps.x, map_wps.y);
     spline_pts_x.push_back(ref_wp[0]);
     spline_pts_y.push_back(ref_wp[1]);
   }

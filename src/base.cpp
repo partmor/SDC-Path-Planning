@@ -11,18 +11,20 @@ int Path::size(){
   return this->pts_x.size();
 }
 
-void Path::set_previous_path_from_json(const nlohmann::json &j){
+Path Path::previous_path_from_json(const nlohmann::json &j){
+
   auto prev_path_x = j[1]["previous_path_x"];
   auto prev_path_y = j[1]["previous_path_y"];
 
-  int lel = prev_path_x.size();
-
+  Path path;
   for(int i = 0; i < prev_path_x.size(); i++){
-    this->pts_x.push_back(prev_path_x[i]);
-    this->pts_y.push_back(prev_path_y[i]);
+    path.pts_x.push_back(prev_path_x[i]);
+    path.pts_y.push_back(prev_path_y[i]);
   }
 
-  this->end_s = j[1]["end_path_s"];
-  this->end_d = j[1]["end_path_d"];
+  path.end_s = j[1]["end_path_s"];
+  path.end_d = j[1]["end_path_d"];
+
+  return path;
 }
 

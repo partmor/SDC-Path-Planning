@@ -32,7 +32,7 @@ struct Path {
   double end_d;
 
   int size();
-  void set_previous_path_from_json(const nlohmann::json &j);
+  static Path previous_path_from_json(const nlohmann::json &j);
 };
 
 

@@ -103,8 +103,7 @@ int main() {
           car.set_state_from_json(j);
 
           // Previous path data given to the Planner
-          Path previous_path;
-          previous_path.set_previous_path_from_json(j);
+          Path previous_path = Path::previous_path_from_json(j);
 
           // Sensor Fusion Data, a list of all other cars on the same side of the road.
           auto sensor_fusion = j[1]["sensor_fusion"];

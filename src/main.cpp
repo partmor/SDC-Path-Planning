@@ -107,16 +107,10 @@ int main() {
           json msgJson;
 
           PathGenerator path_generator;
-          Path path = path_generator.generate_path(
-            car,
-            lane,
-            ref_vel,
-            previous_path,
-            map_wps
-          );
+          Path new_path = path_generator.generate_path(car,lane,ref_vel,previous_path,map_wps);
 
-          msgJson["next_x"] = path.pts_x;
-          msgJson["next_y"] = path.pts_y;
+          msgJson["next_x"] = new_path.pts_x;
+          msgJson["next_y"] = new_path.pts_y;
 
           auto msg = "42[\"control\","+ msgJson.dump()+"]";
 

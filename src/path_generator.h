@@ -16,7 +16,7 @@
 struct PathGenerator{
   PathGenerator();
 
-  Path generate_path(Vehicle &egoVehicle,
+  Path generate_path(Vehicle &ego_vehicle,
                      int lane,
                      double ref_vel,
                      Path &previous_path,

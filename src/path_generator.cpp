@@ -9,7 +9,7 @@
 
 PathGenerator::PathGenerator(){}
 
-Path PathGenerator::generate_path(Vehicle &egoVehicle,
+Path PathGenerator::generate_path(Vehicle &ego_vehicle,
                                   int lane,
                                   double ref_vel,
                                   Path &previous_path,
@@ -42,9 +42,9 @@ Path PathGenerator::generate_path(Vehicle &egoVehicle,
   // if previous path is "nearly" empty, use the car's actual state as one of the starting
   // reference points
   else{
-    ref_x = egoVehicle.state.x;
-    ref_y = egoVehicle.state.y;
-    ref_yaw = deg2rad(egoVehicle.state.yaw);
+    ref_x = ego_vehicle.state.x;
+    ref_y = ego_vehicle.state.y;
+    ref_yaw = deg2rad(ego_vehicle.state.yaw);
 
     // we want the path to be "smooth", so we define the second starting reference
     // waypoint behind the car such that the path is tangent to the car's trajectory
@@ -62,7 +62,7 @@ Path PathGenerator::generate_path(Vehicle &egoVehicle,
   // define rest of reference waypoints for the spline, ahead from the starting reference
   // points just defined, evenly spaced. 5 (2 + 3) points in total are used.
   for(int i = 0; i < 3; i++){
-    double wp_s = egoVehicle.state.s + (i + 1) * 30;
+    double wp_s = ego_vehicle.state.s + (i + 1) * 30;
     double wp_d = 2 + 4 * lane;
     vector<double> ref_wp = getXY(wp_s, wp_d, map_wps.s, map_wps.x, map_wps.y);
     spline_pts_x.push_back(ref_wp[0]);

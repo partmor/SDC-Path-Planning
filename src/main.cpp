@@ -95,20 +95,18 @@ int main() {
         if (event == "telemetry") {
           // j[1] is the data JSON object
           
-        	// Main car's localization Data
+        	// get main car's state (position, orientation, velocity)
           car.set_state_from_simulator_json(j);
 
-          // Previous path data given to the Planner
+          // get last cycle's remaining (not executed) fraction of the path
           Path previous_path = Path::previous_path_from_json(j);
 
-          // Sensor Fusion Data, a list of all other cars on the same side of the road.
-          auto sensor_fusion = j[1]["sensor_fusion"];
-
-          json msgJson;
-
+          // trajectory generator
           PathGenerator path_generator;
           Path new_path = path_generator.generate_path(car,lane,ref_vel,previous_path,map_wps);
 
+          // push generated path back to simulator
+          json msgJson;
           msgJson["next_x"] = new_path.pts_x;
           msgJson["next_y"] = new_path.pts_y;
 

@@ -12,18 +12,8 @@
 
 using namespace std;
 
-enum Lane {
-  LEFT = 2, MIDDLE = 1, RIGHT = 0
-};
-
-struct State {
-  double x;
-  double y;
-  double yaw;
-  double s;
-  double d;
-  double v;
-};
+#define DT_SIM 0.02;
+#define LANE_WIDTH 4.0;
 
 struct MapWaypoints {
   vector<double> x;

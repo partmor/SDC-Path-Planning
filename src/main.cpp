@@ -73,8 +73,8 @@ int main() {
   // initial velocity
   double ref_vel = 49.5 / 2.24; // in m/s
 
-  // ego vehicle, id = 0
-  Vehicle car = Vehicle(0);
+  // ego vehicle
+  EgoVehicle car = EgoVehicle();
 
   h.onMessage([&map_wps, &ref_vel, &lane, &car]
                (uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
@@ -96,7 +96,7 @@ int main() {
           // j[1] is the data JSON object
           
         	// Main car's localization Data
-          car.set_state_from_json(j);
+          car.set_state_from_simulator_json(j);
 
           // Previous path data given to the Planner
           Path previous_path = Path::previous_path_from_json(j);

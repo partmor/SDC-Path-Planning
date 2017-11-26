@@ -9,7 +9,7 @@
 
 PathGenerator::PathGenerator(){}
 
-Path PathGenerator::generate_path(Vehicle &ego_vehicle,
+Path PathGenerator::generate_path(EgoVehicle &ego_vehicle,
                                   int lane,
                                   double ref_vel,
                                   Path &previous_path,

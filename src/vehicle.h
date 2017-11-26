@@ -13,15 +13,18 @@
 using namespace std;
 
 struct Vehicle{
-
   int id;
   State state;
 
   Vehicle(const int i);
   virtual ~Vehicle();
 
-  void set_state_from_json(const nlohmann::json &j);
+};
 
+
+struct EgoVehicle : Vehicle{
+  EgoVehicle();
+  void set_state_from_simulator_json(const nlohmann::json &j);
 };
 
 

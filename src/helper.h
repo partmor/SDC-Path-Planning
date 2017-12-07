@@ -9,10 +9,13 @@
 #define HELPER_H_
 
 #include <math.h>
-#include "Eigen-3.3/Eigen/Core"
-#include "Eigen-3.3/Eigen/QR"
+#include <vector>
+
+#include "Eigen-3.3/Eigen/Dense"
 
 using namespace std;
+using Eigen::MatrixXd;
+using Eigen::VectorXd;
 
 // for converting back and forth between radians and degrees.
 constexpr double pi();
@@ -31,5 +34,7 @@ vector<double> getFrenet(double x, double y, double theta, const vector<double> 
 
 // transform from Frenet s,d coordinates to Cartesian x,y
 vector<double> getXY(double s, double d, const vector<double> &maps_s, const vector<double> &maps_x, const vector<double> &maps_y);
+
+vector<double> get_JMT(vector<double> start, vector<double> end, double T);
 
 #endif /* HELPER_H_ */

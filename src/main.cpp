@@ -5,6 +5,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <limits>
 #include "Eigen-3.3/Eigen/Core"
 #include "Eigen-3.3/Eigen/QR"
 #include "json.hpp"
@@ -67,16 +68,10 @@ int main() {
   	map_wps.dy.push_back(d_y);
   }
 
-  // set initial lane
-  int lane = 1;
-
-  // initial velocity
-  double ref_vel = 49.5 / 2.24; // in m/s
-
   // ego vehicle
   EgoVehicle car = EgoVehicle();
 
-  h.onMessage([&map_wps, &ref_vel, &lane, &car]
+  h.onMessage([&map_wps, &car]
                (uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -101,9 +96,45 @@ int main() {
           // get last cycle's remaining (not executed) fraction of the path
           Path previous_path = Path::previous_path_from_json(j);
 
+          // get rest of vehicles in the road, detected by sensors
+          vector<OtherVehicle> other_vehicles = OtherVehicle::from_sensor_fusion_json(j);
+
+
+          int lane = car.state.lane;
+
+          // get vehicle ahead in lane
+          OtherVehicle vehicle_ahead;
+          bool found_vehicle_ahead = false;
+          double s_min = numeric_limits<double>::infinity();
+          for(int i = 0; i < other_vehicles.size(); i++){
+            OtherVehicle other_vehicle = other_vehicles[i];
+            bool in_lane = other_vehicle.state.lane == lane;
+            if(in_lane && other_vehicle.state.s > car.state.s && other_vehicle.state.s < s_min){
+              s_min = other_vehicle.state.s;
+              vehicle_ahead = other_vehicle;
+              found_vehicle_ahead = true;
+            }
+          }
+
+          // keep lane state
+          double max_vel = mph2ms(48.0);
+
+          car.fsm_state.lane_obj = car.state.lane;
+          if(found_vehicle_ahead){
+            car.fsm_state.v_obj = vehicle_ahead.state.v;
+            double dist_ahead = vehicle_ahead.state.s - car.state.s;
+            cout << "distance vehicle ahead: " << dist_ahead << endl;
+          } else {
+            car.fsm_state.v_obj = max_vel;
+            cout << "distance vehicle ahead: NA" << endl;
+          }
+
+          cout << "current v: " << car.state.v << endl;
+          cout << "desired v: " << car.fsm_state.v_obj << endl;
+
           // trajectory generator
           PathGenerator path_generator;
-          Path new_path = path_generator.generate_path(car,lane,ref_vel,previous_path,map_wps);
+          Path new_path = path_generator.generate_path(car, previous_path, map_wps);
 
           // push generated path back to simulator
           json msgJson;

@@ -17,8 +17,6 @@ struct PathGenerator{
   PathGenerator();
 
   Path generate_path(EgoVehicle &ego_vehicle,
-                     int lane,
-                     double ref_vel,
                      Path &previous_path,
                      const MapWaypoints map_wps);
 };

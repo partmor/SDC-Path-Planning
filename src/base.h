@@ -14,6 +14,7 @@ using namespace std;
 
 #define DT_SIM 0.02;
 #define LANE_WIDTH 4.0;
+#define ROAD_MAX_VEL 22.3; // in m/s,  2.24 mph = 1 m/s
 
 struct MapWaypoints {
   vector<double> x;

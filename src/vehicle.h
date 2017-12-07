@@ -10,6 +10,7 @@
 
 #include <string>
 #include "base.h"
+#include "helper.h"
 
 using namespace std;
 

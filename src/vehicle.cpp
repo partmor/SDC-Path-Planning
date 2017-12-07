@@ -72,7 +72,7 @@ void EgoVehicle::set_state_from_simulator_json(const nlohmann::json &j){
   this->state.yaw = j[1]["yaw"];
   this->state.s = j[1]["s"];
   this->state.d = j[1]["d"];
-  this->state.v = j[1]["speed"];
+  this->state.v = mph2ms(j[1]["speed"]);
 
   // infer lane number using d coordinate
   this->state.lane = (int) this->state.d / LANE_WIDTH;

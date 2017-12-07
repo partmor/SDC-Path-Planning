@@ -10,6 +10,7 @@
 /*
  * Vehicle
  */
+Vehicle::Vehicle(){}
 Vehicle::Vehicle(const int id){
   this->id = id;
 }
@@ -19,6 +20,7 @@ Vehicle::~Vehicle(){}
 /*
  * OtherVehicle
  */
+OtherVehicle::OtherVehicle() : Vehicle::Vehicle(){}
 OtherVehicle::OtherVehicle(const int id) : Vehicle::Vehicle(id){}
 
 void OtherVehicle::predict_state(const double t_horizon){

@@ -27,12 +27,15 @@ struct FSMState{
   string state;
   double s_obj;
   double d_obj;
+  int lane_obj;
+  double v_obj;
 };
 
 struct Vehicle{
   int id;
   State state;
 
+  Vehicle();
   Vehicle(const int id);
   virtual ~Vehicle();
 
@@ -41,6 +44,7 @@ struct Vehicle{
 struct OtherVehicle : Vehicle{
   State predicted_state;
 
+  OtherVehicle();
   OtherVehicle(const int id);
   void predict_state(const double t_horizon);
   static vector<OtherVehicle> from_sensor_fusion_json(const nlohmann::json &j);

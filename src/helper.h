@@ -17,10 +17,14 @@ using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-// for converting back and forth between radians and degrees.
+// for converting back and forth between radians and degrees
 constexpr double pi();
 double deg2rad(double x);
 double rad2deg(double x);
+
+// for converting back and forth between m/s and mph
+double ms2mph(double x);
+double mph2ms(double x);
 
 // Euclidean distance between two points, given their (x,y) coordinates
 double distance(double x1, double y1, double x2, double y2);

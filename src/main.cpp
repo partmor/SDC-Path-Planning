@@ -130,6 +130,7 @@ int main() {
             double dist_ahead = vehicle_ahead_cl.state.s - car.state.s;
             cout << "distance vehicle ahead: " << dist_ahead << endl;
           } else {
+            car.fsm_state.lane_obj = car.state.lane;
             car.fsm_state.v_obj = max_vel;
             cout << "distance vehicle ahead: NA" << endl;
           }

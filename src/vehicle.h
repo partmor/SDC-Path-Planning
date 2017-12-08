@@ -9,6 +9,7 @@
 #define VEHICLE_H_
 
 #include <string>
+#include <limits>
 #include "base.h"
 #include "helper.h"
 
@@ -47,15 +48,18 @@ struct OtherVehicle : Vehicle{
 
   OtherVehicle();
   OtherVehicle(const int id);
-  void predict_state(const double t_horizon);
+  void predict_state_cv_nlc(const double t_horizon);
   static vector<OtherVehicle> from_sensor_fusion_json(const nlohmann::json &j);
 };
 
 struct EgoVehicle : Vehicle{
   FSMState fsm_state;
+  vector<OtherVehicle> other_vehicles;
 
   EgoVehicle();
   void set_state_from_simulator_json(const nlohmann::json &j);
+  void detect_other_vehicles_from_sensor_json(const nlohmann::json &j);
+  bool get_vehicle_ahead(int search_lane, OtherVehicle &vehicle_ahead);
 };
 
 

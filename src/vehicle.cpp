@@ -23,7 +23,8 @@ Vehicle::~Vehicle(){}
 OtherVehicle::OtherVehicle() : Vehicle::Vehicle(){}
 OtherVehicle::OtherVehicle(const int id) : Vehicle::Vehicle(id){}
 
-void OtherVehicle::predict_state(const double t_horizon){
+void OtherVehicle::predict_state_cv_nlc(const double t_horizon){
+  // predict future state, assuming constant velocity and no lange change
   State current_state = this->state;
   State pred_state;
   pred_state.s = current_state.s + current_state.v * t_horizon;
@@ -76,4 +77,24 @@ void EgoVehicle::set_state_from_simulator_json(const nlohmann::json &j){
 
   // infer lane number using d coordinate
   this->state.lane = (int) this->state.d / LANE_WIDTH;
+}
+
+void EgoVehicle::detect_other_vehicles_from_sensor_json(const nlohmann::json &j){
+  this->other_vehicles = OtherVehicle::from_sensor_fusion_json(j);
+}
+
+bool EgoVehicle::get_vehicle_ahead(int search_lane, OtherVehicle &vehicle_ahead){
+  bool found_vehicle_ahead = false;
+  double s_min = numeric_limits<double>::infinity();
+  for(int i = 0; i < this->other_vehicles.size(); i++){
+    OtherVehicle other_vehicle = this->other_vehicles[i];
+    bool in_lane = other_vehicle.state.lane == search_lane;
+    bool ahead = other_vehicle.state.s > this->state.s;
+    if(in_lane && ahead && other_vehicle.state.s < s_min){
+      s_min = other_vehicle.state.s;
+      vehicle_ahead = other_vehicle;
+      found_vehicle_ahead = true;
+    }
+  }
+  return found_vehicle_ahead;
 }

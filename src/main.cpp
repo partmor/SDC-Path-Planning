@@ -97,24 +97,14 @@ int main() {
           Path previous_path = Path::previous_path_from_json(j);
 
           // get rest of vehicles in the road, detected by sensors
-          vector<OtherVehicle> other_vehicles = OtherVehicle::from_sensor_fusion_json(j);
+          car.detect_other_vehicles_from_sensor_json(j);
 
 
           int lane = car.state.lane;
 
           // get vehicle ahead in lane
           OtherVehicle vehicle_ahead;
-          bool found_vehicle_ahead = false;
-          double s_min = numeric_limits<double>::infinity();
-          for(int i = 0; i < other_vehicles.size(); i++){
-            OtherVehicle other_vehicle = other_vehicles[i];
-            bool in_lane = other_vehicle.state.lane == lane;
-            if(in_lane && other_vehicle.state.s > car.state.s && other_vehicle.state.s < s_min){
-              s_min = other_vehicle.state.s;
-              vehicle_ahead = other_vehicle;
-              found_vehicle_ahead = true;
-            }
-          }
+          bool found_vehicle_ahead = car.get_vehicle_ahead(lane, vehicle_ahead);
 
           // keep lane state
           double max_vel = mph2ms(48.0);

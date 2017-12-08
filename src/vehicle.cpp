@@ -101,3 +101,20 @@ bool EgoVehicle::get_vehicle_ahead(int search_lane, OtherVehicle &vehicle_ahead)
   return found_vehicle_ahead;
 }
 
+bool EgoVehicle::get_vehicle_behind(int search_lane, OtherVehicle &vehicle_behind){
+  bool found_vehicle_behind = false;
+  double dist_min = numeric_limits<double>::infinity();
+  for(int i = 0; i < this->other_vehicles.size(); i++){
+    OtherVehicle other_vehicle = this->other_vehicles[i];
+    bool in_lane = other_vehicle.state.lane == search_lane;
+    // TODO: check cyclic "s" coordinate singularity (what happens after completing lap?)
+    bool behind = other_vehicle.state.s < this->state.s;
+    double dist = abs(other_vehicle.state.s - this->state.s);
+    if(in_lane && behind && dist < dist_min){
+      dist_min = dist;
+      vehicle_behind = other_vehicle;
+      found_vehicle_behind = true;
+    }
+  }
+  return found_vehicle_behind;
+}

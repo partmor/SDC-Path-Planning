@@ -9,6 +9,7 @@
 #define VEHICLE_H_
 
 #include <string>
+#include <vector>
 #include <limits>
 #include "base.h"
 #include "helper.h"
@@ -60,6 +61,7 @@ struct EgoVehicle : Vehicle{
   void set_state_from_simulator_json(const nlohmann::json &j);
   void detect_other_vehicles_from_sensor_json(const nlohmann::json &j);
   bool get_vehicle_ahead(int search_lane, OtherVehicle &vehicle_ahead);
+  bool get_vehicle_behind(int search_lane, OtherVehicle &vehicle_behind);
 };
 
 

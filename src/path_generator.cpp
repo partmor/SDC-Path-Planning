@@ -69,21 +69,24 @@ Path PathGenerator::generate_path(EgoVehicle &ego_vehicle,
   spline_pts_y.push_back(ref_y);
 
   // if objective speed is not achieved at the end of previous path, accelerate
+  double delta_v = 0.2;
   if(ego_vehicle.fsm_state.v_obj > ref_vel){
-    ref_vel += 0.1;
-  } else {
-    ref_vel -= 0.1;
+    ref_vel += delta_v;
+  }
+  else {
+    ref_vel -= delta_v;
   }
 
-  // define rest of reference waypoints for the spline, ahead from the starting reference
-  // points just defined, evenly spaced. 5 (2 + 3) points in total are used.
+  // define rest of reference waypoints for the spline, ahead from the two starting
+  // reference points just defined, evenly spaced at 30, 60 and 90 m respectively.
+  // 5 (2 + 3) points in total are used.
   double start_s = ego_vehicle.state.s;
   if(prev_path_size > 0){
     start_s = previous_path.end_s;
   }
   for(int i = 0; i < 3; i++){
     double wp_s = start_s + (i + 1) * 30;
-    double wp_d = 2 + 4 * ego_vehicle.state.lane;
+    double wp_d = 2 + 4 * ego_vehicle.fsm_state.lane_obj;
     vector<double> ref_wp = getXY(wp_s, wp_d, map_wps.s, map_wps.x, map_wps.y);
     spline_pts_x.push_back(ref_wp[0]);
     spline_pts_y.push_back(ref_wp[1]);

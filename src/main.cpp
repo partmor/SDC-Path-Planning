@@ -99,20 +99,35 @@ int main() {
           // get rest of vehicles in the road, detected by sensors
           car.detect_other_vehicles_from_sensor_json(j);
 
+          // get vehicle ahead in current lane
+          OtherVehicle vehicle_ahead_cl;
+          bool found_vehicle_ahead_cl = car.get_vehicle_ahead(car.state.lane, vehicle_ahead_cl);
 
-          int lane = car.state.lane;
-
-          // get vehicle ahead in lane
-          OtherVehicle vehicle_ahead;
-          bool found_vehicle_ahead = car.get_vehicle_ahead(lane, vehicle_ahead);
-
-          // keep lane state
+          // keep lane or change to left lane
           double max_vel = mph2ms(48.0);
-
-          car.fsm_state.lane_obj = car.state.lane;
-          if(found_vehicle_ahead){
-            car.fsm_state.v_obj = vehicle_ahead.state.v;
-            double dist_ahead = vehicle_ahead.state.s - car.state.s;
+          if(found_vehicle_ahead_cl){
+            bool near = (vehicle_ahead_cl.state.s - car.state.s) < 50;
+            if(near){
+              car.fsm_state.v_obj = vehicle_ahead_cl.state.v;
+            } else {
+              car.fsm_state.v_obj = max_vel;
+            }
+            car.fsm_state.lane_obj = car.state.lane;
+            // if vehicle ahead is near, change lane (left)
+            if(car.state.lane != 0 && near){
+              cout << "CHANGING TO LEFT LANE" << endl;
+              int left_lane = car.state.lane - 1;
+              car.fsm_state.lane_obj = left_lane;
+              // get vehicle ahead in left lane, to set suitable velocity
+              OtherVehicle vehicle_ahead_ll;
+              bool found_vehicle_ahead_ll = car.get_vehicle_ahead(left_lane, vehicle_ahead_ll);
+              if(found_vehicle_ahead_ll){
+                car.fsm_state.v_obj = vehicle_ahead_ll.state.v;
+              } else {
+                car.fsm_state.v_obj = max_vel;
+              }
+            }
+            double dist_ahead = vehicle_ahead_cl.state.s - car.state.s;
             cout << "distance vehicle ahead: " << dist_ahead << endl;
           } else {
             car.fsm_state.v_obj = max_vel;

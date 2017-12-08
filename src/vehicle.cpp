@@ -85,16 +85,19 @@ void EgoVehicle::detect_other_vehicles_from_sensor_json(const nlohmann::json &j)
 
 bool EgoVehicle::get_vehicle_ahead(int search_lane, OtherVehicle &vehicle_ahead){
   bool found_vehicle_ahead = false;
-  double s_min = numeric_limits<double>::infinity();
+  double dist_min = numeric_limits<double>::infinity();
   for(int i = 0; i < this->other_vehicles.size(); i++){
     OtherVehicle other_vehicle = this->other_vehicles[i];
     bool in_lane = other_vehicle.state.lane == search_lane;
+    // TODO: check cyclic "s" coordinate singularity (what happens after completing lap?)
     bool ahead = other_vehicle.state.s > this->state.s;
-    if(in_lane && ahead && other_vehicle.state.s < s_min){
-      s_min = other_vehicle.state.s;
+    double dist = abs(other_vehicle.state.s - this->state.s);
+    if(in_lane && ahead && dist < dist_min){
+      dist_min = dist;
       vehicle_ahead = other_vehicle;
       found_vehicle_ahead = true;
     }
   }
   return found_vehicle_ahead;
 }
+

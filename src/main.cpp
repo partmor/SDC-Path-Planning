@@ -94,7 +94,7 @@ int main() {
           car.set_state_from_simulator_json(j);
 
           // get last cycle's remaining (not executed) fraction of the path
-          Path previous_path = Path::previous_path_from_json(j);
+          car.set_previous_path_from_simulator_json(j);
 
           // get rest of vehicles in the road, detected by sensors
           car.detect_other_vehicles_from_sensor_json(j);
@@ -102,6 +102,13 @@ int main() {
           // get vehicle ahead in current lane
           OtherVehicle vehicle_ahead_cl;
           bool found_vehicle_ahead_cl = car.get_vehicle_ahead(car.state.lane, vehicle_ahead_cl);
+
+          // get vehicle behind in current lane
+          OtherVehicle vehicle_behind_cl;
+          bool found_vehicle_behind_cl = car.get_vehicle_behind(car.state.lane, vehicle_behind_cl);
+
+          cout << "----------------------------" << endl;
+          cout << "prev. path size: " << car.prev_path.size() << endl;
 
           // keep lane or change to left lane
           double max_vel = mph2ms(48.0);
@@ -134,13 +141,17 @@ int main() {
             car.fsm_state.v_obj = max_vel;
             cout << "distance vehicle ahead: NA" << endl;
           }
+          if(found_vehicle_behind_cl){
+            double dist_behind = car.state.s - vehicle_behind_cl.state.s;
+            cout << "distance vehicle behind: " << dist_behind << endl;
+          }
 
           cout << "current v: " << car.state.v << endl;
           cout << "desired v: " << car.fsm_state.v_obj << endl;
 
           // trajectory generator
           PathGenerator path_generator;
-          Path new_path = path_generator.generate_path(car, previous_path, map_wps);
+          Path new_path = path_generator.generate_path(car, map_wps);
 
           // push generated path back to simulator
           json msgJson;

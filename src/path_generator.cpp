@@ -10,9 +10,9 @@
 PathGenerator::PathGenerator(){}
 
 Path PathGenerator::generate_path(EgoVehicle &ego_vehicle,
-                                  Path &previous_path,
                                   const MapWaypoints map_wps){
 
+  Path previous_path = ego_vehicle.prev_path;
   int prev_path_size = previous_path.size();
 
   // IMPORTANT:

@@ -101,11 +101,11 @@ int main() {
 
           // get vehicle ahead in current lane
           OtherVehicle vehicle_ahead_cl;
-          bool found_vehicle_ahead_cl = car.get_vehicle_ahead(car.state.lane, vehicle_ahead_cl);
+          bool found_vehicle_ahead_cl = car.get_vehicle_ahead_or_behind(car.state.lane, true, vehicle_ahead_cl);
 
           // get vehicle behind in current lane
           OtherVehicle vehicle_behind_cl;
-          bool found_vehicle_behind_cl = car.get_vehicle_behind(car.state.lane, vehicle_behind_cl);
+          bool found_vehicle_behind_cl = car.get_vehicle_ahead_or_behind(car.state.lane, false, vehicle_behind_cl);
 
           cout << "----------------------------" << endl;
           cout << "prev. path size: " << car.prev_path.size() << endl;
@@ -127,7 +127,7 @@ int main() {
               car.fsm_state.lane_obj = left_lane;
               // get vehicle ahead in left lane, to set suitable velocity
               OtherVehicle vehicle_ahead_ll;
-              bool found_vehicle_ahead_ll = car.get_vehicle_ahead(left_lane, vehicle_ahead_ll);
+              bool found_vehicle_ahead_ll = car.get_vehicle_ahead_or_behind(left_lane, true, vehicle_ahead_ll);
               if(found_vehicle_ahead_ll){
                 car.fsm_state.v_obj = vehicle_ahead_ll.state.v;
               } else {

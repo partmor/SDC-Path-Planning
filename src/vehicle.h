@@ -61,8 +61,7 @@ struct EgoVehicle : Vehicle{
   void set_state_from_simulator_json(const nlohmann::json &j);
   void set_previous_path_from_simulator_json(const nlohmann::json &j);
   void detect_other_vehicles_from_sensor_json(const nlohmann::json &j);
-  bool get_vehicle_ahead(int search_lane, OtherVehicle &vehicle_ahead);
-  bool get_vehicle_behind(int search_lane, OtherVehicle &vehicle_behind);
+  bool get_vehicle_ahead_or_behind(int search_lane, bool search_ahead, OtherVehicle &vehicle);
 };
 
 

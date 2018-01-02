@@ -90,9 +90,9 @@ void EgoVehicle::detect_other_vehicles_from_sensor_json(const nlohmann::json &j)
   this->other_vehicles = OtherVehicle::from_sensor_fusion_json(j);
 }
 
-bool EgoVehicle::get_vehicle_ahead(int search_lane, OtherVehicle &vehicle_ahead){
+bool EgoVehicle::get_vehicle_ahead_or_behind(int search_lane, bool search_ahead, OtherVehicle &vehicle){
   
-  bool found_vehicle_ahead = false;
+  bool found_vehicle = false;
   double dist_min = numeric_limits<double>::infinity();
 
   int prev_path_size = this->prev_path.size();
@@ -110,44 +110,18 @@ bool EgoVehicle::get_vehicle_ahead(int search_lane, OtherVehicle &vehicle_ahead)
     State other_vehicle_pred_state = other_vehicle.predict_state_cv_nlc(t_ref);
     bool in_lane = other_vehicle_pred_state.lane == search_lane;
     // TODO: check cyclic "s" coordinate singularity (what happens after completing lap?)
-    bool ahead = other_vehicle_pred_state.s > s_ref;
+    bool flag;
+    if(search_ahead){
+      flag = other_vehicle_pred_state.s > s_ref;
+    } else {
+      flag = other_vehicle_pred_state.s < s_ref;
+    }
     double dist = fabs(other_vehicle_pred_state.s - s_ref);
-    if(in_lane && ahead && (dist < dist_min)){
+    if(in_lane && flag && (dist < dist_min)){
       dist_min = dist;
-      vehicle_ahead = other_vehicle;
-      found_vehicle_ahead = true;
+      vehicle = other_vehicle;
+      found_vehicle = true;
     }
   }
-  return found_vehicle_ahead;
-}
-
-bool EgoVehicle::get_vehicle_behind(int search_lane, OtherVehicle &vehicle_behind){
-
-  bool found_vehicle_behind = false;
-  double dist_min = numeric_limits<double>::infinity();
-
-  int prev_path_size = this->prev_path.size();
-  double s_ref;
-  double t_ref = prev_path_size * (double)DT_SIM;
-  if(prev_path_size > 0){
-    s_ref = this->prev_path.end_s;
-  }
-  else{
-    s_ref = this->state.s;
-  }
-
-  for(int i = 0; i < this->other_vehicles.size(); i++){
-    OtherVehicle other_vehicle = this->other_vehicles[i];
-    State other_vehicle_pred_state = other_vehicle.predict_state_cv_nlc(t_ref);
-    bool in_lane = other_vehicle_pred_state.lane == search_lane;
-    // TODO: check cyclic "s" coordinate singularity (what happens after completing lap?)
-    bool behind = other_vehicle_pred_state.s < s_ref;
-    double dist = fabs(other_vehicle_pred_state.s - s_ref);
-    if(in_lane && behind && dist < dist_min){
-      dist_min = dist;
-      vehicle_behind = other_vehicle;
-      found_vehicle_behind = true;
-    }
-  }
-  return found_vehicle_behind;
+  return found_vehicle;
 }

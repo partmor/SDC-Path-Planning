@@ -109,9 +109,13 @@ int main() {
 
           cout << "current v: " << car.state.v << endl;
           cout << "desired v: " << target_state.v_obj << endl;
+          if(target_state.changing_lane){
+            cout << "changing lane..." << endl;
+          }
 
           car.fsm_state.lane_obj = target_state.lane_obj;
           car.fsm_state.v_obj = target_state.v_obj;
+          car.fsm_state.changing_lane = target_state.changing_lane;
 
           // trajectory generator
           PathGenerator path_generator;

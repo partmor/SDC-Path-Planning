@@ -32,6 +32,7 @@ struct FSMState{
   double d_obj;
   int lane_obj;
   double v_obj;
+  bool changing_lane = false;
 };
 
 struct Vehicle{

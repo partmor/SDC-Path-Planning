@@ -123,5 +123,72 @@ bool EgoVehicle::get_vehicle_ahead_or_behind(int search_lane, bool search_ahead,
       found_vehicle = true;
     }
   }
+
+  string debug_case;
+  if(search_ahead){
+    debug_case = "ahead";
+  } else {
+    debug_case = "behind";
+  }
+  if(found_vehicle){
+    cout << "lane " << search_lane << " vehicle " << debug_case << ": " << dist_min << endl;
+  } else {
+    cout << "lane " << search_lane << " vehicle " << debug_case << ": NA" << endl;
+  }
+
   return found_vehicle;
+}
+
+LaneKinematics EgoVehicle::get_lane_kinematics(int search_lane){
+
+  double gap_ahead = numeric_limits<double>::infinity();
+  double gap_behind = numeric_limits<double>::infinity();
+  double lane_velocity = ROAD_MAX_VEL;
+
+  int prev_path_size = this->prev_path.size();
+  double s_ref;
+  double t_ref = prev_path_size * (double)DT_SIM;
+  if(prev_path_size > 0){
+    s_ref = this->prev_path.end_s;
+  }
+  else{
+    s_ref = this->state.s;
+  }
+
+  // get vehicle ahead in query lane
+  OtherVehicle vehicle_ahead;
+  bool found_vehicle_ahead = this->get_vehicle_ahead_or_behind(
+    search_lane, 
+    true, 
+    vehicle_ahead
+  );
+
+  // get vehicle behind in query lane
+  OtherVehicle vehicle_behind;
+  bool found_vehicle_behind = this->get_vehicle_ahead_or_behind(
+    search_lane, 
+    false, 
+    vehicle_behind
+  );
+
+  if(found_vehicle_ahead){
+    State ahead_vehicle_predicted_state = vehicle_ahead.predict_state_cv_nlc(t_ref);
+    gap_ahead = ahead_vehicle_predicted_state.s - s_ref;
+    lane_velocity = ahead_vehicle_predicted_state.v;
+  }
+
+  if(found_vehicle_behind){
+    State behind_vehicle_predicted_state = vehicle_behind.predict_state_cv_nlc(t_ref);
+    gap_behind = s_ref - behind_vehicle_predicted_state.s;
+    if(!found_vehicle_ahead){
+      lane_velocity = behind_vehicle_predicted_state.v;
+    }
+  }
+
+  LaneKinematics res;
+  res.id = search_lane;
+  res.gap_ahead = gap_ahead;
+  res.gap_behind = gap_behind;
+  res.v = lane_velocity;
+  return res;
 }

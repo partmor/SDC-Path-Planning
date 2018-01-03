@@ -45,7 +45,6 @@ struct Vehicle{
 };
 
 struct OtherVehicle : Vehicle{
-
   OtherVehicle();
   OtherVehicle(const int id);
   State predict_state_cv_nlc(const double t_horizon);
@@ -62,6 +61,7 @@ struct EgoVehicle : Vehicle{
   void set_previous_path_from_simulator_json(const nlohmann::json &j);
   void detect_other_vehicles_from_sensor_json(const nlohmann::json &j);
   bool get_vehicle_ahead_or_behind(int search_lane, bool search_ahead, OtherVehicle &vehicle);
+  LaneKinematics get_lane_kinematics(int search_lane);
 };
 
 

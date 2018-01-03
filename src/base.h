@@ -14,7 +14,7 @@ using namespace std;
 
 #define DT_SIM 0.02;
 #define LANE_WIDTH 4.0;
-#define ROAD_MAX_VEL 22.3; // in m/s,  2.24 mph = 1 m/s
+#define ROAD_MAX_VEL 22.0; // in m/s,  2.24 mph = 1 m/s
 
 struct MapWaypoints {
   vector<double> x;
@@ -32,6 +32,13 @@ struct Path {
 
   int size();
   static Path previous_path_from_json(const nlohmann::json &j);
+};
+
+struct LaneKinematics {
+  int id;
+  double gap_ahead;
+  double gap_behind;
+  double v;
 };
 
 

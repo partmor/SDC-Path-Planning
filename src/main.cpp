@@ -13,6 +13,7 @@
 #include "base.h"
 #include "vehicle.h"
 #include "path_generator.h"
+#include "behaviour_planner.h"
 
 using namespace std;
 
@@ -99,55 +100,18 @@ int main() {
           // get rest of vehicles in the road, detected by sensors
           car.detect_other_vehicles_from_sensor_json(j);
 
-          // get vehicle ahead in current lane
-          OtherVehicle vehicle_ahead_cl;
-          bool found_vehicle_ahead_cl = car.get_vehicle_ahead_or_behind(car.state.lane, true, vehicle_ahead_cl);
+          cout << "---------------" << endl;
 
-          // get vehicle behind in current lane
-          OtherVehicle vehicle_behind_cl;
-          bool found_vehicle_behind_cl = car.get_vehicle_ahead_or_behind(car.state.lane, false, vehicle_behind_cl);
-
-          cout << "----------------------------" << endl;
-          cout << "prev. path size: " << car.prev_path.size() << endl;
-
-          // keep lane or change to left lane
-          double max_vel = mph2ms(48.0);
-          if(found_vehicle_ahead_cl){
-            bool near = (vehicle_ahead_cl.state.s - car.state.s) < 50;
-            if(near){
-              car.fsm_state.v_obj = vehicle_ahead_cl.state.v;
-            } else {
-              car.fsm_state.v_obj = max_vel;
-            }
-            car.fsm_state.lane_obj = car.state.lane;
-            // if vehicle ahead is near, change lane (left)
-            if(car.state.lane != 0 && near){
-              cout << "CHANGING TO LEFT LANE" << endl;
-              int left_lane = car.state.lane - 1;
-              car.fsm_state.lane_obj = left_lane;
-              // get vehicle ahead in left lane, to set suitable velocity
-              OtherVehicle vehicle_ahead_ll;
-              bool found_vehicle_ahead_ll = car.get_vehicle_ahead_or_behind(left_lane, true, vehicle_ahead_ll);
-              if(found_vehicle_ahead_ll){
-                car.fsm_state.v_obj = vehicle_ahead_ll.state.v;
-              } else {
-                car.fsm_state.v_obj = max_vel;
-              }
-            }
-            double dist_ahead = vehicle_ahead_cl.state.s - car.state.s;
-            cout << "distance vehicle ahead: " << dist_ahead << endl;
-          } else {
-            car.fsm_state.lane_obj = car.state.lane;
-            car.fsm_state.v_obj = max_vel;
-            cout << "distance vehicle ahead: NA" << endl;
-          }
-          if(found_vehicle_behind_cl){
-            double dist_behind = car.state.s - vehicle_behind_cl.state.s;
-            cout << "distance vehicle behind: " << dist_behind << endl;
-          }
+          // behaviour planner
+          // calculates the target state 
+          BehaviourPlanner planner;
+          FSMState target_state = planner.get_target_state(car);
 
           cout << "current v: " << car.state.v << endl;
-          cout << "desired v: " << car.fsm_state.v_obj << endl;
+          cout << "desired v: " << target_state.v_obj << endl;
+
+          car.fsm_state.lane_obj = target_state.lane_obj;
+          car.fsm_state.v_obj = target_state.v_obj;
 
           // trajectory generator
           PathGenerator path_generator;

@@ -39,6 +39,12 @@ The vehicle may not have time to execute a complete path or trajectory between t
 
 * `sensor_fusion`: A 2D vector of all sensed cars in the same side of the track, and their attributes: unique ID, *x* position in map coordinates [meters], *y* position in map coordinates [meters], *x* velocity [m/s], *y* velocity [m/s], *s* position in Frenet coordinates [meters], *d* position in Frenet coordinates [meters]. 
 
+### Additional details about the simulator
+
+* The ego vehicle uses a perfect controller and will visit every `(x, y)` point it receives in the path every 0.02 seconds. Hence, the spacing of the points determines the speed of the car. The vector going from a point to the next one in the planned trajectory dictates the angle of the car. Acceleration both in the tangential and normal directions are measured, along with the jerk (rate of change of total acceleration).
+
+* There is some latency between the start of a planning cycle by the simulator and the path planner returning a path. With *fairly* optimized code this should take around one to three time steps (~ 60 ms). During this delay the simulator will continue visiting points from the latest path it was provided. This is important to consider in order to generate smooth paths.
+
 ---
 
 ## Dependencies

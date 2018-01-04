@@ -8,35 +8,36 @@ The program for the path planner, written in C++, communicates with the simulato
 
 The autonomous vehicle, with the help of the path planning system, safely navigates around the virtual highway (50 mph limited) with other traffic that is driving at different *arbitrary* velocities below the track limit. The car tries to go as close as possible to the 50 MPH speed limit, passing slower traffic when possible, without experiencing total acceleration over 10 m/s^2 or jerk greater than 10 m/s^3. The car also avoids hitting other cars at all cost as well as driving inside of the marked road lanes at all times, unless it performs a lane change maneuver.
 
-#### Main car's localization data (noiseless)
+## Inputs
 
-["x"] The car's x position in map coordinates
+A static [map of the track](data/higway_map.csv) is provided. It contains the geometrical data of a sequence of waypoints located along the center line of the highway:
 
-["y"] The car's y position in map coordinates
+* `x`, `y`: global coordinates of the waypoint, in meters.
+* `s`: Frenet longitudinal displacement coordinate in meters. Ranges from 0 to 6945.554 meters (closed loop).
+* `dx`, `dy`: unit normal vector components to the highway's center line, pointing outward of the highway loop.
 
-["s"] The car's s position in frenet coordinates
+Additionally, at the beginning of each planning cycle, the simulator serves the program the following inputs in JSON format:
 
-["d"] The car's d position in frenet coordinates
+#### Ego vehicle's noiseless localization data (noiseless)
 
-["yaw"] The car's yaw angle in the map
+* `x`, `y`: Cartesian global (map) coordinates of the car's latest position, in meters.
+* `s`, `d`: Frenet coordinates of the car's latest position, in meters.
+* `yaw`: Car's heading angle with respect to global *x* axis, positive counter-clockwise, in degrees.
+* `speed`: The car's scalar velocity, in mph.
 
-["speed"] The car's speed in MPH
+#### Remaining points from previous path
 
-#### Previous path data given to the planner
+The vehicle may not have time to execute a complete path or trajectory between two planning cycles. The previous path data consists of the trajectory points generated during the last planning cycle, and that were not executed.
 
-["previous_path_x"] The previous list of x points previously given to the simulator
+*  `previous_path_x`, `previous_path_y`: lists of *x* and *y* global coordinates of the remaining path points from the previous cycle.
 
-["previous_path_y"] The previous list of y points previously given to the simulator
+#### Previous path's *s* and *d* end values
 
-#### Previous path's end s and d values 
+* `end_path_s`, `end_path_d`: Frenet coordinates of the endpoint of the path planned in the previous cycle.
 
-["end_path_s"] The previous list's last point's frenet s value
+#### Noiseless sensor fusion data
 
-["end_path_d"] The previous list's last point's frenet d value
-
-#### Sensor fusion data (noiseless), a list of all other car's attributes on the same side of the road.
-
-["sensor_fusion"] A 2d vector of cars and then that car's [car's unique ID, car's x position in map coordinates, car's y position in map coordinates, car's x velocity in m/s, car's y velocity in m/s, car's s position in frenet coordinates, car's d position in frenet coordinates. 
+* `sensor_fusion`: A 2D vector of all sensed cars in the same side of the track, and their attributes: unique ID, *x* position in map coordinates [meters], *y* position in map coordinates [meters], *x* velocity [m/s], *y* velocity [m/s], *s* position in Frenet coordinates [meters], *d* position in Frenet coordinates [meters]. 
 
 ---
 

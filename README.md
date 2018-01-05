@@ -62,6 +62,21 @@ Two different vehicle classes were defined, both inheriting from a `Vehicle` bas
 
 A single instance of `EgoVehicle`, named `car`, is used throughout the program execution. It is instantiated outside the planning loop and is updated in each cycle. The JSON data parsing is performed by the `EgoVehicle::set_state_from_simulator_json()`, `EgoVehicle::set_previous_path_from_simulator_json()`, and `EgoVehicle::detect_other_vehicles_from_sensor_json()` methods.
 
+### 2. Behaviour planning
+
+The behaviour planner (defined in [src/behaviour_planner.h](src/behaviour_planner.h)) is responsible for providing the target state for the ego vehicle. The `BehaviourPlanner` class implements a primitive Finite State Machine, with three states: 
+
+* Stay in lane
+* Change to left lane
+* Change to right lane
+
+The simple decision tree that establishes the transition logic between states is implemented in the `BehaviourPlanner::get_target_state()` method. The output of the latter is the target lane and target velocity, encapsulated in a `FSMState` object.
+
+The `car` can measure the state of the current and adjacent lanes via its `EgoVehicle::get_lane_kinematics()` which provides, for a given lane, the available gaps ahead and behind, as well as traffic flow velocity, stored in a `LaneKinematics` object. This lane state is evaluated in the future horizon, i.e, distances and traffic flow velocity are calculated based on the predicted states of the surrounding detected `OtherVehicles` in the future instant corresponding to the end of the previous path. To predict the state of the surrounding traffic, a very simple and naive model was taken for this first version of the program: vehicles move at a constant (scalar) velocity, and will not perform lane changes. This model is implemented in the `OtherVehicle::predict_state_cv_nlc()` method (*cv_nlc* stands for constant velocity no lane change).
+
+Hence, `BehaviourPlanner::get_target_state()` will check the distance with the car in front. If greater than `dist_pass`, the ego vehicle will continue in the current lane at maximum velocity, otherwise it will explore the availability of adjacent lanes, via the `BehaviourPlanner::is_lane_safe()` method, giving preference to left lane changes (left-overtaking is preferred). If the lane change cannot be performed immediately the `car`'s velocity is adjusted to `delta_v_safe` (< 1) times the leading vehicle's velocity in order to avoid collision.
+
+When it is safe to change lane, the target lane is set equal to the lane the car is willing to switch to, and the target velocity is set equal to the traffic flow velocity of the target lane.
 
 ---
 

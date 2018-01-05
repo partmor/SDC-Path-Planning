@@ -16,25 +16,6 @@
 
 using namespace std;
 
-struct State {
-  double x;
-  double y;
-  double yaw;
-  double s;
-  double d;
-  double v;
-  int lane;
-};
-
-struct FSMState{
-  string state;
-  double s_obj;
-  double d_obj;
-  int lane_obj;
-  double v_obj;
-  bool changing_lane = false;
-};
-
 struct Vehicle{
   int id;
   State state;

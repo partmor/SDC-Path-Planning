@@ -45,6 +45,24 @@ The vehicle may not have time to execute a complete path or trajectory between t
 
 * There is some latency between the start of a planning cycle by the simulator and the path planner returning a path. With *fairly* optimized code this should take around one to three time steps (~ 60 ms). During this delay the simulator will continue visiting points from the latest path it was provided. This is important to consider in order to generate smooth paths.
 
+### 
+
+## Path planning *workflow*
+
+It is easier to visualize the componets that integrate the planning system, and how they connect to eachother, following the program flow as stated in [`main.cpp`](src/main.cpp).
+
+### 1. Data recovery
+
+The data provided by the simulator for the current cycle in JSON format is parsed to extract the current state of the ego vehicle, the remaining path points from previous cycle, and the state of surrounding vehicles detected by sensor fusion.
+
+Two different vehicle classes were defined, both inheriting from a `Vehicle` base class (see definitions in [`vehicle.h`](src/vehicle.h)):
+
+* `EgoVehicle`: allows to keep track of the state of the ego vehicle and encapsulate all functionality oriented to *perceive* the world around it.
+* `OtherVehicle`: allows to keep track of the state of all surrounding vehicles detected by sensor fusion.
+
+A single instance of `EgoVehicle`, named `car`, is used throughout the program execution. It is instantiated outside the planning loop and is updated in each cycle. The JSON data parsing is performed by the `EgoVehicle::set_state_from_simulator_json()`, `EgoVehicle::set_previous_path_from_simulator_json()`, and `EgoVehicle::detect_other_vehicles_from_sensor_json()` methods.
+
+
 ---
 
 ## Dependencies

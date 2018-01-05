@@ -10,7 +10,7 @@
 BehaviourPlanner::BehaviourPlanner(){}
 
 bool BehaviourPlanner::is_lane_safe(LaneKinematics lane_kinematics){
-  double safety_gap_ahead = 40;
+  double safety_gap_ahead = 20;
   double safety_gap_behind = 10;
 
   bool gap_ahead_ok = lane_kinematics.gap_ahead > safety_gap_ahead;
@@ -22,7 +22,7 @@ bool BehaviourPlanner::is_lane_safe(LaneKinematics lane_kinematics){
 
 FSMState BehaviourPlanner::get_target_state(EgoVehicle &car){
   double dist_pass = 20;
-  double delta_v_safe = 0.8;
+  double delta_v_safe = 0.85;
   double d_tol = 0.5;
   FSMState res;
 

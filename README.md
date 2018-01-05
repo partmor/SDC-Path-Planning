@@ -64,7 +64,7 @@ A single instance of `EgoVehicle`, named `car`, is used throughout the program e
 
 ### 2. Behaviour planning
 
-The behaviour planner (defined in [src/behaviour_planner.h](src/behaviour_planner.h)) is responsible for providing the target state for the ego vehicle. The `BehaviourPlanner` class implements a primitive Finite State Machine, with three states: 
+The behaviour planner (implemented in [behaviour_planner.cpp](src/behaviour_planner.cpp)) is responsible for providing the target state for the ego vehicle. The `BehaviourPlanner` class implements a primitive Finite State Machine, with three states: 
 
 * Stay in lane
 * Change to left lane
@@ -77,6 +77,16 @@ The `car` can measure the state of the current and adjacent lanes via its `EgoVe
 Hence, `BehaviourPlanner::get_target_state()` will check the distance with the car in front. If greater than `dist_pass`, the ego vehicle will continue in the current lane at maximum velocity, otherwise it will explore the availability of adjacent lanes, via the `BehaviourPlanner::is_lane_safe()` method, giving preference to left lane changes (left-overtaking is preferred). If the lane change cannot be performed immediately the `car`'s velocity is adjusted to `delta_v_safe` (< 1) times the leading vehicle's velocity in order to avoid collision.
 
 When it is safe to change lane, the target lane is set equal to the lane the car is willing to switch to, and the target velocity is set equal to the traffic flow velocity of the target lane.
+
+### 3. Path generator
+
+Finally, the target state determined by the behaviour planner is fed into the path generator, implemented in [path_generator.cpp](src/path_generator.cpp).
+
+The `PathGenerator::generate_path()` method uses the behaviour planner's target state (stored in `car.fsm_state`) together with the `car`'s current state, the remaining previous path points, and static map waypoints to generate the updated `x`, `y` coordinates of the trajectory the vehicle most follow.
+
+The trajectory is generated *recycling* the remaining points of the previous path in order to achieve a smooth transitions. New points up to the desired future horizon (1 second - 50 points to be visted every 0.02 seconds) are generated applying splines between previous path's endpoint and the target position. A third party [cubic spline library](http://kluge.in-chemnitz.de/opensource/spline/) was used for this task.
+
+Further details about the waypoint interpolation process can be found in the comments in [path_generator.cpp](src/path_generator.cpp).
 
 ---
 
